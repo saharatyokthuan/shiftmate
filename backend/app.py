@@ -282,4 +282,4 @@ if __name__ == '__main__':
     print("  🌐 http://localhost:5000")
     print("  📡 API: /api/employees | /api/shifts | /api/schedule")
     print("=" * 55)
-    app.run(host='0.0.0.0', port=5000, debug=True
+    app.run(host='0.0.0.0', port=5000, debug=True)

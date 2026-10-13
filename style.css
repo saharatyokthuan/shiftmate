@@ -20,16 +20,16 @@
  * 1. ตัวแปรสี/ขนาด และ Reset
  * ===================================================================== */
 :root {
-  --c-header: #2c3e50;       /* สี header / nav */
-  --c-primary: #3498db;      /* สีหลัก */
-  --c-primary-dark: #2a80b9;
-  --c-bg: #ecf0f1;           /* สีพื้นหลัง */
-  --c-card: #ffffff;
-  --c-text: #2c3e50;
-  --c-muted: #7f8c8d;
-  --c-border: #d5dbe0;
-  --c-line: #e3e8ec;
-  --c-danger: #e74c3c;
+  --c-header: #0f0f23;       /* สี header / nav - ฟ้ามidian */
+  --c-primary: #00d4ff;      /* สีหลัก - ฟ้าขนนีออน */
+  --c-primary-dark: #00a8cc;
+  --c-bg: #0d0d20;           /* สีพื้นหลัง - กระดี่อวกาศ */
+  --c-card: #1a1a30;         /* สีบัตร/การ์ด */
+  --c-text: #e8e8f0;         /* สีข้อความ - ขาวอ่อน */
+  --c-muted: #6a6a8c;        /* สีโทนรอง */
+  --c-border: #3d3d5d;       /* สีขอบ */
+  --c-line: #555577;         /* สีเส้นแบ่ง */
+  --c-danger: #ff6b6b;       /* สีเตือน */
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
