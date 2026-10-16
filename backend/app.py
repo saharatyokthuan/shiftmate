@@ -234,35 +234,55 @@ def backup():
 def restore():
     """กู้คืนจาก JSON — ลบของเดิมทั้งหมด"""
     data = request.get_json() or {}
-    if not isinstance(data.get('employees'), list) or not isinstance(data.get('shifts'), list):
+    if not isinstance(data, dict) or not isinstance(data.get('employees'), list) \
+            or not isinstance(data.get('shifts'), list):
         return jsonify({'error': 'รูปแบบไม่ถูกต้อง'}), 400
 
+    schedule = data.get('schedule')
+    if not isinstance(schedule, dict):
+        schedule = {}
+
     with db() as conn:
+        # ล้างของเดิมทั้งหมด (schedule ลบก่อนเพราะมี FK อ้างถึง)
         conn.execute("DELETE FROM schedule")
         conn.execute("DELETE FROM employees")
         conn.execute("DELETE FROM shifts")
 
         for e in data['employees']:
+            if not isinstance(e, dict):
+                continue
             conn.execute("""
                 INSERT INTO employees (id, code, fullname, position, phone)
                 VALUES (?, ?, ?, ?, ?)
             """, (e.get('id') or uid('emp'), e.get('code', ''),
-                  e['fullname'], e.get('position', ''), e.get('phone', '')))
+                  e.get('fullname', ''), e.get('position', ''), e.get('phone', '')))
 
         for s in data['shifts']:
+            if not isinstance(s, dict):
+                continue
             conn.execute("""
                 INSERT INTO shifts (id, code, name, start_time, end_time,
                                     color, overnight, ot_until, is_off)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (s.get('id') or uid('shift'), s['code'], s.get('name', ''),
+            """, (s.get('id') or uid('shift'), s.get('code', ''), s.get('name', ''),
                   s.get('start_time', ''), s.get('end_time', ''),
                   s.get('color', '#3498db'),
                   1 if s.get('overnight') else 0,
                   s.get('ot_until'),
                   1 if s.get('is_off') else 0))
 
-        for date, day in (data.get('schedule') or {}).items():
+        # อ้างอิงที่ถูกต้องจริงหลัง insert (กัน FK error จากข้อมูลอ้างอิงที่ไม่มีอยู่)
+        emp_ids = {r['id'] for r in conn.execute("SELECT id FROM employees")}
+        shift_ids = {r['id'] for r in conn.execute("SELECT id FROM shifts")}
+
+        for date, day in schedule.items():
+            if not isinstance(day, dict):
+                continue
             for emp_id, entry in day.items():
+                if not isinstance(entry, dict) or not entry.get('shiftId'):
+                    continue
+                if emp_id not in emp_ids or entry['shiftId'] not in shift_ids:
+                    continue  # ข้ามรายการที่อ้างถึงพนักงาน/ผลัดที่ไม่มีอยู่
                 conn.execute("""
                     INSERT INTO schedule (date, emp_id, shift_id, ot)
                     VALUES (?, ?, ?, ?)
